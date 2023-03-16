@@ -37,7 +37,7 @@ check_sa_dup <- function(SA){
 
     } else if (SA %has_all% c("SASEV")) { ##"AETOXGR", 
 
-        fail("SA has both variables: AESEV.") ##AETOXGR and 
+        fail("SA has both variables: SASEV.") ##AETOXGR and 
 
     } else if (SA %lacks_all% c( "SASEV")) { ##"AETOXGR",
 
