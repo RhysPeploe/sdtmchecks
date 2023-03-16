@@ -1,4 +1,4 @@
-#' @title Check for duplicate AE entries
+#' @title Check for duplicate SA entries
 #'
 #' @description Identifies duplicated AE entries based on USUBJID, AETERM,
 #'   AEDECOD, AESTDTC, AEENDTC, AEMODIFY (if present), AELAT (if present) and AETOXGR or AESEV
@@ -23,44 +23,44 @@
 #'                  AESPID="FORMNAME-R:5/L:5XXXX",
 #'                  stringsAsFactors=FALSE)
 #'
-#' check_ae_dup(AE)
+#' check_sa_dup(SA)
 #'
 #'
 #'
 
-check_ae_dup <- function(AE){
+check_sa_dup <- function(SA){
 
     # Checks whether required variables are in dataset
-    if (AE %lacks_any% c("USUBJID", "AEDECOD", "AESTDTC", "AEENDTC", "AETERM")) {
+    if (SA %lacks_any% c("USUBJID",  "SATERM")) {  ##"SADECOD", "AESTDTC", "AEENDTC",
 
-        fail(lacks_msg(AE, c("USUBJID", "AEDECOD", "AESTDTC", "AEENDTC", "AETERM")))
+        fail(lacks_msg(SA, c("USUBJID", "SATERM"))) ## "AEDECOD", "AESTDTC", "AEENDTC"
 
-    } else if (AE %has_all% c("AETOXGR", "AESEV")) {
+    } else if (SA %has_all% c("SASEV")) { ##"AETOXGR", 
 
-        fail("AE has both variables: AETOXGR and AESEV.")
+        fail("SA has both variables: AESEV.") ##AETOXGR and 
 
-    } else if (AE %lacks_all% c("AETOXGR", "AESEV")) {
+    } else if (SA %lacks_all% c( "SASEV")) { ##"AETOXGR",
 
-        fail("AE is missing both the AETOXGR and AESEV variable.")
+        fail("SA is missing thE SASEV variable.") ## 
 
     } else {
 
         # Use either AETOXGR or AESEV, depending on which is in the AE dataset
-        toxgr_var <- if(AE %has_all% "AETOXGR") "AETOXGR" else "AESEV"
-        lat_var <- if (AE %has_all% "AELAT") "AELAT" else NULL
+        ##toxgr_var <- "AESEV" ##if(AE %has_all% "AETOXGR") "AETOXGR" else
+        ##lat_var <- if (AE %has_all% "AELAT") "AELAT" else NULL
 
-        if (AE %lacks_any% c("AEMODIFY")){
+        if (SA %lacks_any% c("AEMODIFY")){
             # When AEMODIFY not in AE
             # Subsets to duplicated entries only
-            df <- AE %>%
-                select(USUBJID, AETERM, AEDECOD, AESTDTC, AEENDTC, any_of(c(toxgr_var,lat_var))) %>%
+            df <- SA %>%
+                select(USUBJID, SATERM, SASEV) %>%
                 group_by_all() %>%
                 filter(n()>1)
         }else {
             # When AEMODIFY in AE
             # Subsets to duplicated entries only
-            df <- AE %>%
-                select(USUBJID, AETERM, AEDECOD, AESTDTC, AEENDTC, AEMODIFY, any_of(c(toxgr_var,lat_var))) %>%
+            df <- SA %>%
+                select(USUBJID, SATERM, SASEV, SAMODIFY, any_of(c(toxgr_var,lat_var))) %>%
                 group_by_all() %>%
                 filter(n()>1)
         }
@@ -68,7 +68,7 @@ check_ae_dup <- function(AE){
         # Outputs a resulting message depending on whether there are duplicates
         if (nrow(df) != 0) {
 
-            fail("AE has duplicated entries. ", df)
+            fail("SA has duplicated entries. ", df)
 
         } else {
 
